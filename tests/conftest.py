@@ -10,9 +10,10 @@ def pytest_addoption(parser):
     )
     parser.addoption(
         "--url",
-        default="http://opencart.test",
+        default="http://localhost/opencart",
         help="Base URL of the shop"
     )
+
     parser.addoption(
         "--headless",
         action="store_true",
