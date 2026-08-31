@@ -15,3 +15,6 @@ ENV/
 htmlcov/
 
 *.log
+
+allure-results/
+allure-report/
