@@ -1,24 +1,31 @@
 import pytest
+import allure
+import logging
 from selenium import webdriver
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 
 def pytest_addoption(parser):
     parser.addoption(
         "--browser",
         default="chrome",
-        help="Browser to run tests: chrome or firefox"
+        help="Browser to run tests: chrome or firefox",
     )
     parser.addoption(
         "--url",
         default="http://localhost/opencart",
-        help="Base URL of the shop"
+        help="Base URL of the shop",
     )
-
     parser.addoption(
         "--headless",
         action="store_true",
         default=False,
-        help="Run browser in headless mode"
+        help="Run browser in headless mode",
     )
 
 
@@ -57,3 +64,17 @@ def driver(browser, request):
     drv.implicitly_wait(5)
     yield drv
     drv.quit()
+
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    rep = outcome.get_result()
+    if rep.when == "call" and rep.failed:
+        drv = item.funcargs.get("driver")
+        if drv:
+            allure.attach(
+                drv.get_screenshot_as_png(),
+                name="screenshot_on_failure",
+                attachment_type=allure.attachment_type.PNG,
+            )
