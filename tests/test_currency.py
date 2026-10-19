@@ -1,36 +1,43 @@
 import time
 import pytest
+import allure
 from pages.main_page import MainPage
 from pages.catalog_page import CatalogPage
 
 
-def test_currency_switch_on_main(driver, base_url):
-    page = MainPage(driver)
-    page.open(base_url)
+@allure.feature("Currency")
+class TestCurrency:
 
-    price_before = page.get_first_product_price()
+    @allure.story("Main Page")
+    @allure.title("Currency switch on main page")
+    def test_currency_switch_on_main(self, driver, base_url):
+        page = MainPage(driver)
+        page.open(base_url)
 
-    if page.get_currency_items_count() <= 1:
-        pytest.skip("Only one currency available")
+        price_before = page.get_first_product_price()
 
-    page.switch_currency(index=1)
-    time.sleep(2)
+        if page.get_currency_items_count() <= 1:
+            pytest.skip("Only one currency available")
 
-    price_after = page.get_first_product_price()
-    assert price_before != price_after
+        page.switch_currency(index=1)
+        time.sleep(2)
 
+        price_after = page.get_first_product_price()
+        assert price_before != price_after
 
-def test_currency_switch_in_catalog(driver, base_url):
-    page = CatalogPage(driver)
-    page.open(base_url)
+    @allure.story("Catalog Page")
+    @allure.title("Currency switch in catalog")
+    def test_currency_switch_in_catalog(self, driver, base_url):
+        page = CatalogPage(driver)
+        page.open(base_url)
 
-    price_before = page.get_first_product_price()
+        price_before = page.get_first_product_price()
 
-    if page.get_currency_items_count() <= 1:
-        pytest.skip("Only one currency available")
+        if page.get_currency_items_count() <= 1:
+            pytest.skip("Only one currency available")
 
-    page.switch_currency(index=1)
-    time.sleep(2)
+        page.switch_currency(index=1)
+        time.sleep(2)
 
-    price_after = page.get_first_product_price()
-    assert price_before != price_after
+        price_after = page.get_first_product_price()
+        assert price_before != price_after
