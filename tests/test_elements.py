@@ -1,4 +1,5 @@
 import allure
+
 from pages.main_page import MainPage
 from pages.catalog_page import CatalogPage
 from pages.product_page import ProductPage
@@ -27,14 +28,14 @@ class TestPageElements:
     @allure.title("Check product page elements")
     def test_product_page_elements(self, driver, base_url):
         page = ProductPage(driver)
-        page.open(f"{base_url}/index.php?route=product/product&product_id=43")
+        page.open(base_url)
         page.check_elements()
 
     @allure.story("Admin Login Page")
     @allure.title("Check admin login page elements")
-    def test_admin_login_page_elements(self, driver, base_url):
+    def test_admin_login_page_elements(self, driver, base_url, admin_folder):
         page = AdminLoginPage(driver)
-        page.open(base_url)
+        page.open(base_url, admin_folder)
         page.check_elements()
 
     @allure.story("Registration Page")
