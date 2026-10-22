@@ -1,6 +1,8 @@
-import pytest
-import allure
 import logging
+import os
+
+import allure
+import pytest
 from selenium import webdriver
 
 logging.basicConfig(
@@ -18,14 +20,14 @@ def pytest_addoption(parser):
     )
     parser.addoption(
         "--url",
-        default="http://localhost/opencart",
+        default=os.getenv("SHOP_URL", "http://localhost:8080"),
         help="Base URL of the shop",
     )
     parser.addoption(
         "--headless",
         action="store_true",
-        default=False,
-        help="Run browser in headless mode",
+        default=os.getenv("HEADLESS", "0") == "1",
+        help="Run browser in headless mode (enabled by default in Docker)",
     )
 
 
@@ -36,7 +38,22 @@ def browser(request):
 
 @pytest.fixture(scope="session")
 def base_url(request):
-    return request.config.getoption("--url")
+    return request.config.getoption("--url").rstrip("/")
+
+
+@pytest.fixture(scope="session")
+def admin_folder():
+    return os.getenv("ADMIN_FOLDER", "admin")
+
+
+@pytest.fixture(scope="session")
+def admin_email():
+    return os.getenv("ADMIN_EMAIL", "admin@prestashop.com")
+
+
+@pytest.fixture(scope="session")
+def admin_password():
+    return os.getenv("ADMIN_PASSWORD", "AdminDemo-2026-Pass")
 
 
 @pytest.fixture(scope="function")
@@ -45,6 +62,13 @@ def driver(browser, request):
 
     if browser == "chrome":
         options = webdriver.ChromeOptions()
+        options.add_experimental_option(
+            "prefs",
+            {
+                "credentials_enable_service": False,
+                "profile.password_manager_enabled": False,
+            },
+        )
         if headless:
             options.add_argument("--headless")
         options.add_argument("--no-sandbox")
